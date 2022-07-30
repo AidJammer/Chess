@@ -3,6 +3,7 @@ gameBoard = [['.' for i in range(9)] for j in range(9)]
 columns = 'abcdefgh'
 rows = '87654321'
 pieces = ['r', 'n', 'b', 'k', 'q', 'b', 'n', 'r', 'p']
+r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k': False}
 player_Turn = True
 
 for i in range(8):
@@ -63,13 +64,14 @@ def collision(r, c, new_r, new_c):
 
 
 def valid_move(r, c, new_r, new_c):
-    global gameBoard, player_Turn
+    global gameBoard, player_Turn, r_k_moved
 
     piece_true = gameBoard[r][c]
     sq_val = gameBoard[new_r][new_c]
     piece_low = gameBoard[r][c].lower()
     r_diff = abs(r - new_r)
     c_diff = abs(c - new_c)
+    rook = "R" + sq_val if c_diff > c else "L" + sq_val
 
     if player_Turn and piece_true.islower() or not player_Turn and piece_true.isupper():
         print("Piece selected not valid, please select a valid piece from your side to move.")
@@ -82,6 +84,23 @@ def valid_move(r, c, new_r, new_c):
         elif not player_Turn:
             if r > new_r or (r > new_r and c_diff == 1 and sq_val.isupper()):
                 return True
+
+    elif piece_low == 'n':
+        if (r_diff == 1 and c_diff == 2) or (r_diff == 2 and c_diff == 1):
+            return True
+
+    elif piece_low == 'b':
+        if r_diff == c_diff:
+            return True
+
+    elif piece_low == 'q':
+        if r_diff == c_diff or r_diff == 0 or c_diff == 0:
+            return True
+
+    elif piece_low == 'r':
+        if r_diff == 0 or c_diff == 0:
+            if not r_k_moved[rook]:
+                r_k_moved[rook] = True
 
 # Movement input from player, selected as row and column of piece to move and row, col for square to move to.
 # Holds values when legal move is selected.
