@@ -5,6 +5,8 @@ rows = '87654321'
 pieces = ['r', 'n', 'b', 'k', 'q', 'b', 'n', 'r', 'p']
 r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k': False}
 player_Turn = True
+play1_check = False
+play2_check = False
 cap_upper = 0
 cap_lower = 0
 
@@ -148,7 +150,7 @@ def valid_move(r, c, new_r, new_c):
 
 
 def checkmate(r, c, new_r, new_c):
-    global gameBoard, player_Turn
+    global gameBoard, player_Turn, play1_check, play2_check
 
     play1_k_checked = False
     play2_k_checked = False
@@ -156,7 +158,17 @@ def checkmate(r, c, new_r, new_c):
     for i in range(1, 8):
         for j in range(1, 8):
             if gameBoard[i][j] == 'k':
+                if sq_under_ass(i, j):
+                    play2_check = True
 
+                    for k in [-1, 0, 1]:
+                        for m in [-1, 0, 1]:
+                            try:
+                                if not sq_under_ass(k, m):
+
+                                    return False
+                            except:
+                                pass
 
 
 # Movement input from player, selected as row and column of piece to move and row, col for square to move to.
