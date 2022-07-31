@@ -7,6 +7,8 @@ r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k'
 player_Turn = True
 play1_check = False
 play2_check = False
+play1_mate = False
+play2_mate = False
 cap_upper = 0
 cap_lower = 0
 
@@ -89,7 +91,7 @@ def sq_under_ass(new_r, new_c):
 
 
 def valid_move(r, c, new_r, new_c):
-    global gameBoard, player_Turn, r_k_moved, new_row, new_col
+    global gameBoard, player_Turn, r_k_moved, new_row, new_col, play1_check, play2_check
 
     piece_true = gameBoard[r][c]
     sq_val = gameBoard[new_r][new_c]
@@ -100,6 +102,9 @@ def valid_move(r, c, new_r, new_c):
 
     if player_Turn and piece_true.islower() or not player_Turn and piece_true.isupper():
         print("Piece selected not valid, please select a valid piece from your side to move.")
+        return False
+    elif (player_Turn and play1_check and piece_true != 'K') or (not player_Turn and play2_check and piece_true != 'k'):
+        print("King in check, must move king.")
         return False
 
     if piece_low == 'p':
@@ -150,25 +155,40 @@ def valid_move(r, c, new_r, new_c):
 
 
 def checkmate(r, c, new_r, new_c):
-    global gameBoard, player_Turn, play1_check, play2_check
+    global gameBoard, player_Turn, play1_check, play2_check, play1_mate, play2_mate
 
-    play1_k_checked = False
-    play2_k_checked = False
+    play1_done = False
+    play2_done = False
 
     for i in range(1, 8):
         for j in range(1, 8):
             if gameBoard[i][j] == 'k':
-                if sq_under_ass(i, j):
-                    play2_check = True
-
+                while sq_under_ass(i, j) and not play2_done:
+                    if not play2_check:
+                        play2_check = True
                     for k in [-1, 0, 1]:
                         for m in [-1, 0, 1]:
                             try:
-                                if not sq_under_ass(k, m):
-
-                                    return False
+                                if not sq_under_ass((i+k), (j+m)) and gameBoard[(i+k)][(j+m)] == '.':
+                                    play2_done = True
                             except:
                                 pass
+                    if not play2_done:
+                        play2_mate = True
+
+            elif gameBoard[i][j] == 'K':
+                while sq_under_ass(i, j) and not play1_done:
+                    if not play1_check:
+                        play1_check = True
+                    for k in [-1, 0, 1]:
+                        for m in [-1, 0, 1]:
+                            try:
+                                if not sq_under_ass((i+k), (j+m)) and gameBoard[(i+k)][(j+m)] == '.':
+                                    play1_done = True
+                            except:
+                                pass
+                    if not play1_done:
+                        play1_mate = True
 
 
 # Movement input from player, selected as row and column of piece to move and row, col for square to move to.
