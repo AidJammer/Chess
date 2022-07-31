@@ -5,6 +5,8 @@ rows = '87654321'
 pieces = ['r', 'n', 'b', 'k', 'q', 'b', 'n', 'r', 'p']
 r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k': False}
 player_Turn = True
+cap_upper = 0
+cap_lower = 0
 
 for i in range(8):
     curr = i + 1
@@ -63,8 +65,29 @@ def collision(r, c, new_r, new_c):
         return True
 
 
+def sq_under_ass(new_r, new_c):
+    global gameBoard
+
+    pieces_checked = 0 + cap_lower if player_Turn else 0 + cap_upper
+
+    while pieces_checked != 16:
+        for i in range(1, 8):
+            for j in range(1, 8):
+                if player_Turn and gameBoard[i][j].islower() and gameBoard[i][j] != '.':
+                    if collision(i, j, new_r, new_c) and valid_move(i, j, new_r, new_c):
+                        return True
+                    else:
+                        pieces_checked += 1
+                elif not player_Turn and gameBoard[i][j].isupper() and gameBoard[i][j] != '.':
+                    if collision(i, j, new_r, new_c) and valid_move(i, j, new_r, new_c):
+                        return True
+                    else:
+                        pieces_checked += 1
+    return False
+
+
 def valid_move(r, c, new_r, new_c):
-    global gameBoard, player_Turn, r_k_moved
+    global gameBoard, player_Turn, r_k_moved, new_row, new_col
 
     piece_true = gameBoard[r][c]
     sq_val = gameBoard[new_r][new_c]
@@ -101,6 +124,40 @@ def valid_move(r, c, new_r, new_c):
         if r_diff == 0 or c_diff == 0:
             if not r_k_moved[rook]:
                 r_k_moved[rook] = True
+
+    elif piece_low == 'k':
+        if sq_val.lower() == 'r':
+            if player_Turn and sq_val.isupper() and not r_k_moved[piece_true] and not r_k_moved[rook]:
+                new_col = c + 2 if c < new_c else c - 2
+                for i in range(c, new_col+1):
+                    if sq_under_ass(r, i):
+                        return False
+                r_k_moved[piece_true] = True
+                r_k_moved[rook] = True
+                return True
+            elif not player_Turn and sq_val.islower() and not r_k_moved[piece_true] and not r_k_moved[rook]:
+                new_col = c + 2 if c < new_c else c - 2
+                for i in range(c, new_col+1):
+                    if sq_under_ass(r, i):
+                        return False
+                r_k_moved[piece_true] = True
+                r_k_moved[rook] = True
+                return True
+        elif r_diff in {1, 0} and c_diff in {0, 1} and not sq_under_ass(new_r, new_c):
+            return True
+
+
+def checkmate(r, c, new_r, new_c):
+    global gameBoard, player_Turn
+
+    play1_k_checked = False
+    play2_k_checked = False
+
+    for i in range(1, 8):
+        for j in range(1, 8):
+            if gameBoard[i][j] == 'k':
+
+
 
 # Movement input from player, selected as row and column of piece to move and row, col for square to move to.
 # Holds values when legal move is selected.
