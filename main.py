@@ -1,8 +1,3 @@
-gameBoard = [['.' for i in range(9)] for j in range(9)]
-
-columns = 'abcdefgh'
-rows = '87654321'
-pieces = ['r', 'n', 'b', 'k', 'q', 'b', 'n', 'r', 'p']
 r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k': False}
 player_Turn = True
 play1_check = False
@@ -12,14 +7,55 @@ play2_mate = False
 cap_upper = 0
 cap_lower = 0
 
-for i in range(8):
-    curr = i + 1
-    gameBoard[1][curr] = pieces[i]
-    gameBoard[2][curr] = pieces[8]
-    gameBoard[7][curr] = pieces[8].upper()
-    gameBoard[8][curr] = pieces[i].upper()
-    gameBoard[curr][0] = rows[i]
-    gameBoard[0][curr] = columns[i]
+
+class GameBoard:
+    def __init__(self, piece, colour):
+        self.piece = piece
+        self.colour = colour
+
+
+class Pieces:
+    def __init__(self, move_type, moved):
+        self.move_type = move_type
+        self.moved = moved
+
+    def legal_move(self, current_square, new_square):
+        columns = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
+        row_diff = abs(int(current_square[1]) - int(new_square[1]))
+        col_diff = abs(columns[current_square[0]] - columns[new_square[0]])
+
+        if self.move_type == 'line':
+            if self == 'queen' and (row_diff == 0 or col_diff == 0) or (row_diff == col_diff):
+                return True
+            elif self == 'rook' and (row_diff == 0 or col_diff == 0):
+                return True
+            elif self == 'bishop' and (row_diff == col_diff):
+                return True
+            else:
+                return False
+
+        if self.move_type == 'single':
+            if self == 'pawn' and current_square.colour == "white":
+
+
+
+def build_board():
+    columns = 'abcdefgh'
+    build_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight']
+
+    for i in range(8):
+        for j in range(1, 9):
+            sq = columns[i] + str(j)
+            if sq[1] == '1':
+                sq = GameBoard(build_pieces[i], "white")
+            elif sq[1] == '2':
+                sq = GameBoard("rook", "white")
+            elif sq[1] == '7':
+                sq = GameBoard("rook", "black")
+            elif sq[2] == '8':
+                sq = GameBoard(build_pieces[i], "black")
+            else:
+                sq = GameBoard("none", "none")
 
 
 # Legal square check
