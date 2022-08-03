@@ -1,23 +1,34 @@
-r_k_moved = {'LR': False, 'RR': False, 'Lr': False, 'Rr': False, 'K': False, 'k': False}
 player_Turn = True
 play1_check = False
 play2_check = False
 play1_mate = False
 play2_mate = False
-cap_upper = 0
-cap_lower = 0
+cap_white = 0
+cap_black = 0
+
+threats = {}
 
 
 class GameBoard:
-    def __init__(self, piece, colour):
+    def __init__(self, piece, colour, moved):
         self.piece = piece
         self.colour = colour
+        self.moved = moved
+
+    def valid_square(self, current_square):
+        if self.piece == "none" or (current_square.colour == "white" and self.colour == "black")\
+                                or (current_square.colour == "black" and self.colour == "white"):
+            return True
+        else:
+            return False
 
 
 class Pieces:
-    def __init__(self, move_type, moved):
+    def __init__(self, move_type):
         self.move_type = move_type
-        self.moved = moved
+
+    def valid_capture(self, new_square):
+        if new_square.colour
 
     def legal_move(self, current_square, new_square):
         columns = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
@@ -34,9 +45,29 @@ class Pieces:
             else:
                 return False
 
-        if self.move_type == 'single':
+        elif self.move_type == 'single':
             if self == 'pawn' and current_square.colour == "white":
-
+                if (int(current_square[1]) + 1) == int(new_square[1]):
+                    return True
+                elif (int(current_square[1]) + 1) == int(new_square[1]) \
+                        and (columns[current_square[0]] + 1) == columns[new_square[0]] \
+                        and valid_capture(self, new_square):
+                    return True
+            elif self == 'pawn' and current_square.colour == "black":
+                if (int(current_square[1]) - 1) == int(new_square[1]):
+                    return True
+                elif (int(current_square[1]) - 1) == int(new_square[1]) \
+                        and (columns[current_square[0]] - 1) == columns[new_square[0]] \
+                        and valid_capture(self, new_square):
+                    return True
+            elif self == "king" and row_diff in {0, 1} and col_diff in {0, 1} \
+                    and not new_square.under_assault(current_square.colour):
+                return True
+        elif self == "knight":
+            if (row_diff == 1 and col_diff == 2) or (row_diff == 2 and col_diff == 1):
+                return True
+        else:
+            return False
 
 
 def build_board():
@@ -47,13 +78,13 @@ def build_board():
         for j in range(1, 9):
             sq = columns[i] + str(j)
             if sq[1] == '1':
-                sq = GameBoard(build_pieces[i], "white")
+                sq = GameBoard(build_pieces[i], "white", False)
             elif sq[1] == '2':
-                sq = GameBoard("rook", "white")
+                sq = GameBoard("pawn", "white", False)
             elif sq[1] == '7':
-                sq = GameBoard("rook", "black")
+                sq = GameBoard("pawn", "black", False)
             elif sq[2] == '8':
-                sq = GameBoard(build_pieces[i], "black")
+                sq = GameBoard(build_pieces[i], "black", False)
             else:
                 sq = GameBoard("none", "none")
 
