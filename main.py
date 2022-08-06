@@ -15,6 +15,8 @@ class GameBoard:
         self.colour = colour
         self.moved = moved
 
+        print(self.piece)
+
     def valid_square(self, current_square):
         if self.piece == "none" or (current_square.colour == "white" and self.colour == "black")\
                                 or (current_square.colour == "black" and self.colour == "white"):
@@ -103,7 +105,7 @@ def build_board():
                 sq = GameBoard("pawn", "white", False)
             elif sq[1] == '7':
                 sq = GameBoard("pawn", "black", False)
-            elif sq[2] == '8':
+            elif sq[1] == '8':
                 sq = GameBoard(build_pieces[i], "black", False)
             else:
                 sq = GameBoard("none", "none", False)
@@ -135,12 +137,5 @@ def checkmate(king_square):
     return True
 
 
-gamestate = True
+build_board()
 
-while gamestate:
-    valid_cords = False
-
-    while not valid_cords:
-        current_cords = input("Please enter coordinates of piece to move. ex. a1, b6, h8")
-
-        try current_cords.piece
